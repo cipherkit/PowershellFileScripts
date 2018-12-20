@@ -1,11 +1,14 @@
 from os import listdir, path, makedirs
-from os.path import isfile, join
+from os.path import isfile, join, isdir
 from IPython.display import display, Markdown, Latex
 import nbformat as nbf
 import re, string
 
 
 class Migration(object):
+
+    old_journal_dir = "Z:/data/"
+    new_journal_dir = "Z:/jupyter/new_journal/"
 
     def parse_path(self, wiki):
         filename = re.match('.*\+\+\W(.*)', wiki)
@@ -17,16 +20,20 @@ class Migration(object):
             print("Error:")
             print(wiki)
 
-    def create_new_book(self, title, cells, prefix):
-        if len(title) == 1:
-            nb = nbf.v4.new_notebook()
-            nb['cells'] = cells
-            fname = prefix + "/" + title[0] + ".ipynb"
-            with open(fname, 'w', encoding='utf8') as f:
-                nbf.write(nb, f)
-        elif len(title) > 1:
-            pre = self.create_folder(title[0:-1], prefix)
-            self.create_new_book([title[-1]], cells, pre)
+    def add_cell(self, book_uri, cells):
+        if isfile(book_uri):
+            self.extend_book(book_uri, cells)
+        else:
+            self.create_new_book(uri, cells)
+
+    def create_new_book(self, book_uri, cells):
+        nb = nbf.v4.new_notebook()
+        nb['cells'] = cells
+        split_uri = book_uri.split("/")
+        if not isdir("/".join(split_uri[:-1])):
+            makedirs("/".join(split_uri[:-1]))
+        with open(book_uri, 'w', encoding='utf8') as f:
+            nbf.write(nb, f)
 
     def extend_book(self, book_uri, cells):
         nb = nbf.read(book_uri, as_version=4)
@@ -45,9 +52,11 @@ class Migration(object):
             makedirs(path_to_book)
         return path.abspath(path_to_book)
 
-    # def parse_minutia(self, cell_text):
-    #     # bullets
-    #     single_pattern = re.compile("^\w*\*", re.I)
+    def get_book_uri(self, title):
+        if len(title) == 1:
+            return new_journal_dir + "/index.ipynb"
+        else:
+            return new_journal_dir + "/".join(title[:-1]) + ".ipynb"
 
     def parse_page(self, wiki_file):
         # returns path and new cell_text
@@ -56,6 +65,7 @@ class Migration(object):
         text_body_lines = self.parse_links(lines[1:])
         final_title = "    ##" + "/".join(title) + "\n"
         text_body_lines.insert(0, final_title)
+        book_uri = get_book_uri(title)
         return title, text_body_lines
 
     def parse_links(self, cell_lines):
@@ -86,15 +96,14 @@ class Migration(object):
             return "[" + "/".join(olt[2:]) + prefix + "/".join(olt[2:-1]) + ".ipynb)"
 
 if __name__ == "__main__":
-    old_journal_dir = "Z:/data/"
-    new_journal_dir = "Z:/jupyter/new_journal/"
+
     m = Migration()
     wikifiles = [f for f in listdir(old_journal_dir) if isfile(join(old_journal_dir, f))]
     wikifiles.sort()
     for wiki in wikifiles:
         with open(old_journal_dir + wiki, 'r', encoding="utf8") as wiki_file:
             print("Working on " + wiki + "...")
-            title, new_text = m.parse_page(wiki_file)
+            book_uri, new_text = m.parse_page(wiki_file)
             cell = [nbf.v4.new_markdown_cell(new_text)]
-            m.create_new_book(title, cell, new_journal_dir)
+            m.add_cell(book_uri, cell)
     print("Done.")

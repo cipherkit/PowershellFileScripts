@@ -41,22 +41,18 @@ class TestMigration(unittest.TestCase):
 
     def test_create_new_book(self):
         title_input = [
-        ["Date", "2018", "March", "12th"],
-        ["python"],
-        ["Al-Qaeda"],
-        ["10 program projects"],
+        self.prefix + "/Date/2018/March/12th.ipynb",
+        self.prefix + "/index.ipynb"
         ]
         output = []
         xpctd_out = [
             os.path.join(self.prefix + "/Date/2018/March/12th.ipynb"),
-            os.path.join(self.prefix + "/python.ipynb"),
-            os.path.join(self.prefix + "/Al-Qaeda.ipynb"),
-            os.path.join(self.prefix + "/10 program projects.ipynb"),
+            os.path.join(self.prefix + "/index.ipynb")
         ]
         test_cell = []
         test_cell.append(nbf.v4.new_markdown_cell("test"))
         for i in title_input:
-            self.m.create_new_book(i, test_cell, self.prefix)
+            self.m.create_new_book(i, test_cell)
         for xo in xpctd_out:
             self.assertTrue(os.path.exists(xo), xo)
 
