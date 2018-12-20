@@ -15,8 +15,7 @@ class Migration(object):
             return title
         else:
             print("Error:")
-            for i in range(3):
-                print("%i. %s\n".format(i, wiki.readline()))
+            print(wiki)
 
     def create_new_book(self, title, cells, prefix):
         if len(title) == 1:
@@ -46,17 +45,18 @@ class Migration(object):
             makedirs(path_to_book)
         return path.abspath(path_to_book)
 
-    def parse_minutia(self, cell_text):
-        pass
+    # def parse_minutia(self, cell_text):
+    #     # bullets
+    #     single_pattern = re.compile("^\w*\*", re.I)
 
     def parse_page(self, wiki_file):
         # returns path and new cell_text
-        new_cell = ""
-        with open( wiki_file, "r") as f:
-            lines = f.readlines()
-            title = "/".join(parse_path(lines[0]))
-            text_body = parse_links(lines[1:])
-            text_body = "## " + title + "\n".append(text_body)
+        lines = wiki_file.readlines()
+        title = self.parse_path(lines[0])
+        text_body_lines = self.parse_links(lines[1:])
+        final_title = "    ##" + "/".join(title) + "\n"
+        text_body_lines.insert(0, final_title)
+        return title, text_body_lines
 
     def parse_links(self, cell_lines):
         # When the links list for a page is passed in it uses replace link and
@@ -88,13 +88,13 @@ class Migration(object):
 if __name__ == "__main__":
     old_journal_dir = "Z:/data/"
     new_journal_dir = "Z:/jupyter/new_journal/"
-
+    m = Migration()
     wikifiles = [f for f in listdir(old_journal_dir) if isfile(join(old_journal_dir, f))]
     wikifiles.sort()
     for wiki in wikifiles:
         with open(old_journal_dir + wiki, 'r', encoding="utf8") as wiki_file:
-            text = wiki_file.read()
-            title = parse_path(text)
-            if title:
-                cells = create_new_title(title)
-    print("Done!")
+            print("Working on " + wiki + "...")
+            title, new_text = m.parse_page(wiki_file)
+            cell = [nbf.v4.new_markdown_cell(new_text)]
+            m.create_new_book(title, cell, new_journal_dir)
+    print("Done.")

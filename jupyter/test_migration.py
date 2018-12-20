@@ -119,6 +119,8 @@ class TestMigration(unittest.TestCase):
         for xo in xpctd_out:
             self.assertTrue(os.path.exists(xo), xo)
 
+
+
     def test_parse_links(self):
         input =[
         "Hello [//world]",
