@@ -6,7 +6,8 @@ import time
 class TestMigration(unittest.TestCase):
 
     def setUp(self):
-        self.m = Migration()
+        self.m = Migration("./testin", "./tmp")
+        self.xpctd_out = os.path.abspath("./xpctdout")
         self.prefix = os.path.abspath("./tmp")
         if os.path.exists(self.prefix):
             shutil.rmtree(self.prefix)
@@ -38,6 +39,22 @@ class TestMigration(unittest.TestCase):
             self.assertEqual(xpctd_out[ndx], output[ndx],
             "Expected output %s did not match actual output %s".format(
             xpctd_out[ndx], output[ndx]))
+
+    # def test_happy_path(self):
+    #     old_dir = self.m.get_old_journal_dir()
+    #     input = [f for f in os.listdir(old_dir) if os.path.isfile(os.path.join(old_dir, f))]
+    #     output = []
+    #     for i in input:
+    #         with open(old_dir + "/" + i, 'r', encoding="utf8") as in_file:
+    #             book_uri, new_text = self.m.parse_page(in_file)
+    #             cell = [nbf.v4.new_markdown_cell(new_text)]
+    #             self.m.add_cell(book_uri, cell)
+    #     new_dir = self.m.get_new_journal_dir()
+    #     xpctd_out = [f for f in os.listdir(self.xpctd_out) if
+    #                         os.path.isfile(os.path.join(self.xpctd_out, f))]
+    #     out = [f for f in os.listdir(new_dir) if os.path.isfile(os.path.join(new_dir, f))]
+    #     print(xpctd_out)
+    #     print(out)
 
     def test_create_new_book(self):
         title_input = [
@@ -96,6 +113,26 @@ class TestMigration(unittest.TestCase):
         self.assertEqual(xpctd_out, open_book['cells'],
             "%s does not equal %s".format(xpctd_out, open_book['cells']))
 
+    def test_create_footer_tag(self):
+        input = [
+        ["Date", "2018", "March", "12th"],
+        ["python"],
+        ["Al-Qaeda"],
+        ["10 program projects"],
+        ]
+        xpctd_out = [
+        "<a id=" + "Date/2018/March/12th" + "></a>",
+        "<a id=" + "python" + "></a>",
+        "<a id=" + "Al-Qaeda" + "></a>",
+        "<a id=" + "10_program_projects" + "></a>",
+        ]
+
+        output = []
+        for i in input:
+            output.append(self.m.create_footer_tag(i))
+        for ndx in range(len(xpctd_out)):
+            self.assertEqual(xpctd_out[ndx], output[ndx])
+
     def test_create_folder(self):
         input = [
         ["Date", "2018", "March", "12th"],
@@ -115,8 +152,6 @@ class TestMigration(unittest.TestCase):
         for xo in xpctd_out:
             self.assertTrue(os.path.exists(xo), xo)
 
-
-
     def test_parse_links(self):
         input =[
         "Hello [//world]",
@@ -127,17 +162,28 @@ class TestMigration(unittest.TestCase):
         ]
         output = []
         xpctd_out = [
-        ["Hello [world](http://localhost:8888/notebooks/index.ipynb)"],
-        ["can a [list](http://localhost:8888/notebooks/index.ipynb) coexist?"],
-        ["Hello [my/world](http://localhost:8888/notebooks/my.ipynb) you are " +\
-        "[great](http://localhost:8888/notebooks/index.ipynb)"],
-        ["[test](http://localhost:8888/notebooks/index.ipynb) " +\
-        "[test2](http://localhost:8888/notebooks/index.ipynb) " +\
-        "[test3](http://localhost:8888/notebooks/index.ipynb)"],
+        ["Hello [world](#world)"],
+        ['can a [list](#list) coexist?'],
+        ["Hello [my/world](#my/world) you are " +\
+        "[great](#great)"],
+        ["[test](#test) " +\
+        "[test2](#test2) " +\
+        "[test3](#test3)"],
+        ["Err me Gawd", "This is my journal", "it's the best!"],
+        ["Hello [world](" + "\"" + self.m.get_new_journal_dir() + "/" + "index.ipynb\")"],
+        ['can a [list]("' + self.m.get_new_journal_dir() + '/index.ipynb") coexist?'],
+        ["Hello [my/world](\"" + self.m.get_new_journal_dir() + "/my.ipynb\") you are " +\
+        "[great](\"" + self.m.get_new_journal_dir() + "/index.ipynb\")"],
+        ["[test](\"" + self.m.get_new_journal_dir() + "/index.ipynb\") " +\
+        "[test2](\"" + self.m.get_new_journal_dir() + "/index.ipynb\") " +\
+        "[test3](\"" + self.m.get_new_journal_dir() + "/index.ipynb\")"],
         ["Err me Gawd", "This is my journal", "it's the best!"]
         ]
         for i in input:
-            output.append(self.m.parse_links(i))
+            output.append(self.m.parse_links(i, internal_flag=True))
+            output.append(self.m.parse_links(i, internal_flag=False))
+        output.sort()
+        xpctd_out.sort()
         for ndx in range(len(xpctd_out)):
             self.assertEqual(xpctd_out[ndx], output[ndx], "Mismatch")
 
@@ -149,9 +195,9 @@ class TestMigration(unittest.TestCase):
         ]
         output = []
         xpctd_out = [
-        "[abc](http://localhost:8888/notebooks/index.ipynb)",
-        "[123 spaceman](http://localhost:8888/notebooks/index.ipynb)",
-        "[dir/tree/list](http://localhost:8888/notebooks/dir/tree.ipynb)"
+        ("[abc](\"" + self.m.get_new_journal_dir() + "/index.ipynb\")", "[abc](#abc)"),
+        ("[123 spaceman](\"" + self.m.get_new_journal_dir() + "/index.ipynb\")", "[123 spaceman](#123_spaceman)"),
+        ("[dir/tree/list](\"" + self.m.get_new_journal_dir() + "/dir/tree.ipynb\")", "[dir/tree/list](#dir/tree/list)")
         ]
         for i in input:
             output.append(self.m.replace_link(i))
