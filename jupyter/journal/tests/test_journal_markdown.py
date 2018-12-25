@@ -14,33 +14,33 @@ class testJournalMarkdown(unittest.TestCase):
     def tearDown(self):
         pass
 
-    # def test_generate_new_text(self):
-    #     input_keys = ['jm', 'jm2', 'jm3', 'jm4']
-    #     input_dict = {
-    #     'jm': journalMarkdown(0, "++ test", 'heading2', "./tmp/"),
-    #     'jm2': journalMarkdown(0, "*test*", 'bold', "./tmp/"),
-    #     'jm3': journalMarkdown(0, "* test", 'bullet', "./tmp/"),
-    #     'jm4': journalMarkdown(0, "# test\n# test2\n# test3", 'number', "./tmp/"),
-    #     'jm5': journalMarkdown(0, "+ test", 'heading1', "./tmp/"),
-    #     'jm6': journalMarkdown(0, "+++ test", 'heading3', "./tmp/"),
-    #     'jm7': journalMarkdown(0, "++++ test", 'heading4', "./tmp/"),
-    #     'jm8': journalMarkdown(0, "<<*test*>>", 'no_format', "./tmp/"),
-    #     }
-    #     output = {}
-    #     xpctdout = {
-    #     'jm': '## test',
-    #     'jm2': '*test*',
-    #     'jm3': '- test',
-    #     'jm4': '1. test\n2. test2\n3. test3',
-    #     'jm5': '# test',
-    #     'jm6': '### test',
-    #     'jm7': '#### test',
-    #     'jm8': 'test'
-    #     }
-    #     for i in input_keys:
-    #         output[i] = input_dict[i].get_new_text()
-    #     for key in input_keys:
-    #         self.assertEqual(xpctdout[key], output[key], 'not equal')
+    def test_generate_new_text(self):
+        input_keys = ['jm', 'jm2', 'jm3', 'jm4']
+        input_dict = {
+        'jm': journalMarkdown(0, "++ test\n", 'heading2', "./tmp/"),
+        'jm2': journalMarkdown(0, "*test*", 'bold', "./tmp/"),
+        'jm3': journalMarkdown(0, "* test", 'bullet', "./tmp/"),
+        'jm4': journalMarkdown(0, "# test\n# test2\n# test3", 'number', "./tmp/"),
+        'jm5': journalMarkdown(0, "+ test", 'heading1', "./tmp/"),
+        'jm6': journalMarkdown(0, "+++ test", 'heading3', "./tmp/"),
+        'jm7': journalMarkdown(0, "++++ test", 'heading4', "./tmp/"),
+        'jm8': journalMarkdown(0, "<<*test*>>", 'no_format', "./tmp/"),
+        }
+        output = {}
+        xpctdout = {
+        'jm': '## test',
+        'jm2': '*test*',
+        'jm3': '- test',
+        'jm4': '1. test\n2. test2\n3. test3',
+        'jm5': '# test',
+        'jm6': '### test',
+        'jm7': '#### test',
+        'jm8': 'test'
+        }
+        for i in input_keys:
+            output[i] = input_dict[i].get_new_text()
+        for key in input_keys:
+            self.assertEqual(xpctdout[key], output[key], 'not equal')
 
     def test_convert_heading1(self):
         input = [
