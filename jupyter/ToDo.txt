@@ -1,0 +1,68 @@
+Titles are being written such that new titles are appended above the old.
+The new titles need to completely replace the old.
+
+Links are screwed up. External links are being created where internal ones
+should be.
+
+For some reason the entire first half of the wiki pages have been skipped.
+
+It's time for some logging. It will be a good experience to learn how to set Up
+logs.
+
+
+Objects
+journal_link
+journal_markdown
+journal_title
+journal_page
+  title
+  links
+  Markdowns
+journal_book
+  pages
+journal_binder
+  books
+
+Migration script:
+  input wiki pages
+  root_binder =
+    index.ipynb = journal_book()
+    Date =
+          journal_binder(2015)...,
+          journal_binder(2016)...,
+          journal_binder(2017)...,
+          journal_binder(2018)...,
+          journal_binder(2019) =
+                          journal_book(March) =
+                                  journal_page(12th) =
+                                    journal_title,
+                                    journal_link,
+                                    journal_link,
+  Output journal pages
+
+input wiki pages
+for wiki in wiki_pages:
+  binder.add_book(book_uri, wiki)
+
+  binder.add_book(Book_uri, wiki):
+      if book exists:
+        book.add_page(page_name, wiki)
+      else:
+        book.create_book(Book_uri, wiki)
+
+  book.add_page(page_name, wiki)
+      page.append_page(wiki)
+
+  book.create_book(book_uri, wiki)
+      # Go open new book file at Book_uri
+      book.add_page(page_name, wiki)
+
+  page.append_page(book_uri, wiki)
+      - Create cell text
+      - Append Title to cell_text
+      - create list of links in wiki
+      - create list of markdown in wiki
+      - replace links per line depending on internal vs external link.
+      - replace markdown per line or something
+      - add link.create_footer_tag for anchor
+      - read book at book_uri and write cells
