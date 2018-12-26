@@ -1,0 +1,10 @@
+﻿++ Test Wiki
+
+
+
+	* WikiSettings
+    [//single page]
+    [//multipage/one]
+    [//multipage/two]
+    [//multipage/three]
+    
