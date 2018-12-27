@@ -9,7 +9,7 @@ class journalMarkdown(object):
         self.location = location
         self.new_text = self.generate_new_text()
 
-    def get_line(self):
+    def get_line_number(self):
         return self.line
 
     def get_old_text(self):
@@ -38,31 +38,31 @@ class journalMarkdown(object):
         }[self.type]
 
     def convert_heading1(self):
-        pattern = re.compile(r'\W*\+\W(.+)\n', re.I)
-        new_text = re.sub(pattern, r'# \1', self.old_text)
+        pattern = re.compile(r'\+', re.I)
+        new_text = re.sub(pattern, r'#', self.old_text)
         return new_text
 
     def convert_heading2(self):
-        pattern = re.compile(r'\W*\+\+\W(.+)\n', re.I)
-        new_text = re.sub(pattern, r'## \1', self.old_text)
+        pattern = re.compile(r'\+\+', re.I)
+        new_text = re.sub(pattern, r'##', self.old_text)
         return new_text
 
     def convert_heading3(self):
-        pattern = re.compile(r'\W*\+\+\+\W(.+)\n', re.I)
-        new_text = re.sub(pattern, r'### \1', self.old_text)
+        pattern = re.compile(r'\+\+\+', re.I)
+        new_text = re.sub(pattern, r'###', self.old_text)
         return new_text
 
     def convert_heading4(self):
-        pattern = re.compile(r'\W*\+\+\+\+\W(.+)\n', re.I)
-        new_text = re.sub(pattern, r'#### \1', self.old_text)
+        pattern = re.compile(r'\+\+\+\+', re.I)
+        new_text = re.sub(pattern, r'####', self.old_text)
         return new_text
 
     def convert_bold_text(self):
         return self.old_text
 
     def convert_bulleted_text(self):
-        pattern = re.compile(r'\W*\*\W(.+)', re.I)
-        new_text = re.sub(pattern, r'- \1', self.old_text)
+        pattern = re.compile(r'(\W*)\*(\W(.+))', re.I)
+        new_text = re.sub(pattern, r'\1-\2', self.old_text)
         return new_text
 
     def convert_numbered_text(self):
@@ -107,6 +107,6 @@ class journalMarkdown(object):
         return 0
 
     def convert_no_formated_text(self):
-        pattern = re.compile(r'\W*<(.+)>')
-        new_text = re.sub(pattern, r'\1', self.old_text)
+        pattern = re.compile(r'<(.+)>')
+        new_text = re.sub(pattern, r'<\1>', self.old_text)
         return new_text

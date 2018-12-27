@@ -9,6 +9,8 @@ For some reason the entire first half of the wiki pages have been skipped.
 It's time for some logging. It will be a good experience to learn how to set Up
 logs.
 
+Depending on the proceedure of how things are programed there is a possibility that heading1s
+will collide with numbered text.
 
 Objects
 journal_link
@@ -41,28 +43,44 @@ Migration script:
   Output journal pages
 
 input wiki pages
+
+for wiki in wiki_pages:
+  build_binder_list()
+
 for wiki in wiki_pages:
   binder.add_book(book_uri, wiki)
+  # build_binder_list serves as book_uri
+
+print("Done!") # Script has finished adding all the cells
+
+
+class journal_binder:
 
   binder.add_book(Book_uri, wiki):
       if book exists:
-        book.add_page(page_name, wiki)
+        book.add_page(book_uri, wiki)
       else:
         book.create_book(Book_uri, wiki)
 
-  book.add_page(page_name, wiki)
-      page.append_page(wiki)
+
+class journal_book:
+
+  book.add_page(book_uri, wiki)
+      cell_text = page.create_page(wiki)
+      - write cell to book at book_uri
 
   book.create_book(book_uri, wiki)
       # Go open new book file at Book_uri
       book.add_page(page_name, wiki)
 
-  page.append_page(book_uri, wiki)
+
+class journal_page:
+
+  page.create_page(wiki)
       - Create cell text
-      - Append Title to cell_text
       - create list of links in wiki
       - create list of markdown in wiki
-      - replace links per line depending on internal vs external link.
+      - replace links per line depending on internal vs external link in the binder_list
       - replace markdown per line or something
       - add link.create_footer_tag for anchor
-      - read book at book_uri and write cells
+      return cell_text

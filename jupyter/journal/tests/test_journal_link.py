@@ -97,19 +97,28 @@ class testJournalLink(unittest.TestCase):
         for ndx in range(len(xpctd_out)):
             self.assertEqual(xpctd_out[ndx], output[ndx], "Not Equal")
 
+    def test_set_location(self):
+        jl = journalLink(0, "[//dummy]", "./tmp/")
+        input = [
+        '[//link]',
+        '[//link/with/subs]',
+        '[/isanother]',
+        '[/another/another/one/down]',
+        '[one]'
+        ]
+        output = []
+        xpctdout = [
+        './tmp/',
+        './tmp/link/with',
+        './tmp/',
+        './tmp/another/another/one',
+        './tmp/'
+        ]
+        for i in input:
+            output.append(jl.set_location(i))
+        for ndx in range(len(xpctdout)):
+            self.assertEqual(xpctdout[ndx], output[ndx], 'Not Equal')
 
-    # def test_create_dict(self):
-    #     link_dict = self.lh.get_link_dict()
-    #     xpctdout = {
-    #     'Scratch Pad': 'index',
-    #     'multipage/one': 'multipage',
-    #     'multipage/two': 'multipage',
-    #     'multipage/three': 'multipage',
-    #     'single page': 'index',
-    #     'Test Wiki': 'index'
-    #     }
-    #     for key, value in link_dict.items():
-    #         self.assertEqual(xpctdout[key], value, 'not equal')
 
 if __name__ == '__main__':
     unittest.main()
